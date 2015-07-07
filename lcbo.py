@@ -4,7 +4,7 @@ from pprint import pprint
 
 # my auth token. 
 # Get yours at lcboapi.com
-from token import mytoken
+from api_token import mytoken
 
 req = urllib2.Request('https://lcboapi.com/products')
 token_string = "Token %s" % mytoken
