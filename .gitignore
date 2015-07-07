@@ -56,5 +56,9 @@ docs/_build/
 # PyBuilder
 target/
 
-#token
-token.py
+#private token
+api_token.py
+
+#ipython notebook tests
+testing.ipynb
+.ipynb_checkpoints/

@@ -1,15 +1,22 @@
 import requests
+import re
+
 from bs4 import BeautifulSoup
 from pprint import pprint
+
 
 base_url = "http://wiki.webtender.com"
 drink_dict = {}
 
-def get_soup(extended_url=""):
+def get_soup(extended_url="", level="all"):
     url = base_url + extended_url
     response = requests.get(url)
     page = response.text
-    soup = BeautifulSoup(page, "lxml").find(id="mw-pages")
+    if level == "all":
+        soup_id = "mw-pages"
+    elif level == "drink":
+        soup_id="bodyContent"
+    soup = BeautifulSoup(page, "lxml").find(id = soup_id)
     return soup
 
 def has_next_page(soup):
@@ -28,13 +35,42 @@ def drink_links(url="/wiki/Category:Recipes"):
     soup = get_soup(extended_url=url)
     get_drink_links_from_soup(soup)
     next_page = has_next_page(soup)
+    next_page = False
     if next_page:
         drink_links(url=next_page)
 
+def get_drink_info(soup):
+    # get ingredients    
+    print 'ingredients:'
+    recipe_regex = re.compile('recipe', re.IGNORECASE)
+    for element in soup.find(id=recipe_regex).find_next("ul").find_all('li'):
+        print element.text.strip()
+
+    # get instructions
+    all_text = soup.find_all("p")
+    instructions = all_text.pop().text.strip()
+    ## alternatively:
+    #soup.find("ul").next_sibling.next_sibling
+
+    # get background drink info
+    background = "\n".join([remaining_text.text.strip() 
+                            for remaining_text in all_text])
+    print
+    print 'background:'
+    print background
+
+
+
+
 if __name__ == '__main__':
     drink_links()
-    pprint(drink_dict)
+    #pprint(drink_dict)
     print len(drink_dict)
+    drink_level_soup = get_soup(extended_url = drink_dict.values()[10], 
+                   level = "drink",
+    )
+    get_drink_info(drink_level_soup)
+
     
 
 
