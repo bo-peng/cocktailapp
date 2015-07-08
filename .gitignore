@@ -62,3 +62,6 @@ api_token.py
 #ipython notebook tests
 testing.ipynb
 .ipynb_checkpoints/
+
+#data
+*.pkl
