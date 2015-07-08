@@ -1,20 +1,15 @@
+#!/usr/bin/env python
 import flask
-from sklearn.linear_model import LogisticRegression
-import numpy as np
-import pandas as pd
+from pprint import pprint
+import pickle
+import json
 
 #---------- MODEL IN MEMORY ----------------#
 
-# Read the scientific data on breast cancer survival,
-# Build a LogisticRegression predictor on it
-patients = pd.read_csv("haberman.data", header=None)
-patients.columns=['age','year','nodes','survived']
-patients=patients.replace(2,0)  # The value 2 means death in 5 years
+with open("drinks_data.pkl", 'r') as picklefile: 
+    drink_dict = pickle.load(picklefile)
 
-X = patients[['age','year','nodes']]
-Y = patients['survived']
-PREDICTOR = LogisticRegression().fit(X,Y)
-
+#pprint(drink_dict)
 
 #---------- URLS AND WEB PAGES -------------#
 
@@ -27,8 +22,9 @@ def viz_page():
     """
     Homepage: serve our visualization page, awesome.html
     """
-    with open("index.html", 'r') as viz_file:
-        return viz_file.read()
+    #with open("index.html", 'r') as viz_file:
+    #     return viz_file.read()
+    return json.dumps(drink_dict)
 
 # Get an example and return it's score from the predictor model
 @app.route("/score", methods=["POST"])
@@ -48,6 +44,4 @@ def score():
 
 #--------- RUN WEB APP SERVER ------------#
 
-# Start the app server on port 80
-# (The default website port)
-app.run(host='0.0.0.0', port=80)
+app.run(host='0.0.0.0', port=80, debug=True)

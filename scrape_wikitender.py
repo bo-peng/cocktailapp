@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+import sys
 import requests
 import re
+import pickle
 
 from bs4 import BeautifulSoup
 from pprint import pprint
@@ -29,7 +32,7 @@ def get_drink_links_from_soup(soup):
     drink_list_elements = soup.find_all("li")
     for li in drink_list_elements:
         link = li.find("a")
-        drink_dict[link["title"]] = link["href"]
+        drink_dict[link["title"]] = {"link": link["href"]}
     
 def drink_links(url="/wiki/Category:Recipes"):
     soup = get_soup(extended_url=url)
@@ -39,37 +42,50 @@ def drink_links(url="/wiki/Category:Recipes"):
     if next_page:
         drink_links(url=next_page)
 
-def get_drink_info(soup):
+def get_drink_info(soup, drink_name):
     # get ingredients    
-    print 'ingredients:'
+    ingredients = []
+    print >> sys.stderr, "getting %s" % drink_name
     recipe_regex = re.compile('recipe', re.IGNORECASE)
-    for element in soup.find(id=recipe_regex).find_next("ul").find_all('li'):
-        print element.text.strip()
+    try:
+        # try to properly look for 
+        for element in soup.find(id=recipe_regex).find_next("ul").find_all('li'):
+            ingredients.append(element.text.strip())
+            drink_dict[drink_name]["ingredients"] = ingredients
+    except AttributeError:
+        print >> sys.stderr, "looking the brutish way for %s" % drink_name
+        for element in soup.find("ul").find_all("li"):
+            ingredients.append(element.text.strip())
+            drink_dict[drink_name]["ingredients"] = ingredients
 
     # get instructions
     all_text = soup.find_all("p")
-    instructions = all_text.pop().text.strip()
+    if all_text:
+        instructions = all_text.pop().text.strip()
+    else:
+        instructions = ""
     ## alternatively:
     #soup.find("ul").next_sibling.next_sibling
+    drink_dict[drink_name]["instructions"] = instructions
 
     # get background drink info
     background = "\n".join([remaining_text.text.strip() 
                             for remaining_text in all_text])
-    print
-    print 'background:'
-    print background
-
+    drink_dict[drink_name]["background"] = background
 
 
 
 if __name__ == '__main__':
     drink_links()
-    #pprint(drink_dict)
-    print len(drink_dict)
-    drink_level_soup = get_soup(extended_url = drink_dict.values()[10], 
-                   level = "drink",
-    )
-    get_drink_info(drink_level_soup)
+    for drink_name, drink_level_dict in drink_dict.iteritems():
+        drink_level_soup = get_soup(extended_url = drink_level_dict["link"], 
+                                    level = "drink",
+                                )
+        get_drink_info(drink_level_soup, drink_name)
+    with open('drinks_data.pkl', 'w') as picklefile:
+        pickle.dump(drink_dict, picklefile)
+    
+    
 
     
 
