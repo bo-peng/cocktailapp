@@ -4,11 +4,12 @@ from pprint import pprint
 import pickle
 import json
 
-#---------- MODEL IN MEMORY ----------------#
-filename="drinks_data.pkl"
-filename="cocktaildb_drinks_data.pkl"
-with open(filename, 'r') as picklefile: 
-    drink_dict = pickle.load(picklefile)
+from pymongo import MongoClient
+
+#---------- OPEN DATABASE CONNECTION----------------#
+client = MongoClient()
+db = client.cocktailapp
+collection = db.cocktaildb
 
 #pprint(drink_dict)
 
@@ -25,7 +26,39 @@ def viz_page():
     """
     #with open("index.html", 'r') as viz_file:
     #     return viz_file.read()
-    return json.dumps(drink_dict)
+    ingredients_list = ["sweet vermouth", 
+                        "gin", 
+                        "Campari", 
+                        "Cointreau", 
+                        "Scotch"]
+
+    drink_dict = collection.aggregate([{
+        "$project": {
+            "name": 1,
+            "site_id": 1,
+            "ingredients.ingredient":1,
+            "AisSubset": {
+                "$setIsSubset": ["$ingredients.ingredient", ingredients_list]
+            }
+        }
+    },
+    {
+        "$match": {
+            "AisSubset": True
+        }
+    },
+    {
+        "$project": {
+            "name": 1,
+            "site_id": 1,
+            "ingredients.ingredient":1,
+            "_id": 0,
+        }
+    }
+    ])
+    pprint(drink_dict)
+   
+    return flask.jsonify(drink_dict)
 
 # Get an example and return it's score from the predictor model
 @app.route("/score", methods=["POST"])
