@@ -5,8 +5,9 @@ import pickle
 import json
 
 #---------- MODEL IN MEMORY ----------------#
-
-with open("drinks_data.pkl", 'r') as picklefile: 
+filename="drinks_data.pkl"
+filename="cocktaildb_drinks_data.pkl"
+with open(filename, 'r') as picklefile: 
     drink_dict = pickle.load(picklefile)
 
 #pprint(drink_dict)
