@@ -36,16 +36,19 @@ def viz_page():
         "$project": {
             "name": 1,
             "site_id": 1,
-            "ingredients.ingredient":1,
+            "ingredients.ingredient": 1,
             "AisSubset": {
                 "$setIsSubset": ["$ingredients.ingredient", ingredients_list]
-            }
+            },
+            "num_ingredients": {"$size": "$ingredients"}
         }
     },
     {
         "$match": {
-            "AisSubset": True
+            "AisSubset": True,
+            "num_ingredients": {"$gt": 0}
         }
+         
     },
     {
         "$project": {
