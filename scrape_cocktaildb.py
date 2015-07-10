@@ -66,8 +66,8 @@ if __name__ == '__main__':
 
     master_drink_list = []
     #recipes go from 1 to 4758
-    for i in range(1, 4758+1):
-    #for i in range(3555, 4759):
+    #for i in range(1, 4758+1):
+    for i in [4742, 174]:
 
         # for some reason this one page is missing
         if i == 3550:
@@ -93,5 +93,5 @@ if __name__ == '__main__':
         
 
     #pprint(drink_dict)
-    with open('cocktaildb_drinks_data.pkl', 'w') as picklefile:
-        pickle.dump(master_drink_list, picklefile)
+    #with open('cocktaildb_drinks_data.pkl', 'w') as picklefile:
+    #    pickle.dump(master_drink_list, picklefile)

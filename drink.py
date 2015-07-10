@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import flask
 from pprint import pprint
 import pickle
@@ -11,28 +12,8 @@ client = MongoClient()
 db = client.cocktailapp
 collection = db.cocktaildb
 
-#pprint(drink_dict)
-
-#---------- URLS AND WEB PAGES -------------#
-
-# Initialize the app
-app = flask.Flask(__name__)
-
-# Homepage
-@app.route("/")
-def viz_page():
-    """
-    Homepage: serve our visualization page, awesome.html
-    """
-    #with open("index.html", 'r') as viz_file:
-    #     return viz_file.read()
-    ingredients_list = ["sweet vermouth", 
-                        "gin", 
-                        "Campari", 
-                        "Cointreau", 
-                        "Scotch"]
-
-    drink_dict = collection.aggregate([{
+def mongo_query(ingredients_list=[]):
+    return collection.aggregate([{
         "$project": {
             "name": 1,
             "site_id": 1,
@@ -59,9 +40,41 @@ def viz_page():
         }
     }
     ])
+
+
+#pprint(drink_dict)
+
+#---------- URLS AND WEB PAGES -------------#
+
+# Initialize the app
+app = flask.Flask(__name__)
+
+# Homepage
+@app.route("/")
+def viz_page():
+    """
+    Homepage: serve our visualization page, awesome.html
+    """
+    #with open("index.html", 'r') as viz_file:
+    #     return viz_file.read()
+    ingredients_list = ["sweet vermouth", 
+                        "gin", 
+                        "Campari", 
+                        "Cointreau", 
+                        "Scotch"]
+
+
+    drink_dict = mongo_query(ingredients_list)
+    orig_length = len(drink_dict["result"])
+
+    extended_drink_list = ingredients_list + ["fresh lime juice", "sugar"]
+    extended_drink_dict = mongo_query(extended_drink_list)
+    new_length = len(extended_drink_dict["result"])
+
     pprint(drink_dict)
+    print >> sys.stderr, "old %i versus new %i" % (orig_length, new_length)
    
-    return flask.jsonify(drink_dict)
+    return flask.jsonify(extended_drink_dict)
 
 # Get an example and return it's score from the predictor model
 @app.route("/score", methods=["POST"])
