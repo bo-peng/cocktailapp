@@ -17,7 +17,10 @@ def mongo_query(ingredients_list=[]):
         "$project": {
             "name": 1,
             "site_id": 1,
+            "glass_type": 1,
+            "instructions": 1,
             "ingredients.ingredient": 1,
+            "recognitions": 1,
             "AisSubset": {
                 "$setIsSubset": ["$ingredients.ingredient", ingredients_list]
             },
@@ -36,6 +39,9 @@ def mongo_query(ingredients_list=[]):
             "name": 1,
             "site_id": 1,
             "ingredients.ingredient":1,
+            "glass_type": 1,
+            "instructions": 1,
+            "recognitions": 1,
             "_id": 0,
         }
     }
@@ -56,13 +62,25 @@ def viz_page():
     Homepage: serve our visualization page, awesome.html
     """
     #with open("index.html", 'r') as viz_file:
-    #     return viz_file.read()
-    ingredients_list = ["sweet vermouth", 
+    #    return viz_file.read()
+    db_ingredients = ["sweet vermouth", 
                         "gin", 
                         "Campari", 
                         "Cointreau", 
                         "Scotch"]
+    return flask.render_template("index.html", db_ingredients = db_ingredients)
 
+# Get an example and return it's score from the predictor model
+@app.route("/subset", methods=["POST"])
+def subset():
+    """
+    When A POST request with json data is made to this uri,
+    Get the cocktails that can be made with the subset of ingredients
+    """
+    # Get decision score for our example that came with the request
+ 
+    data = flask.request.json
+    ingredients_list = data["ingredients"]
 
     drink_dict = mongo_query(ingredients_list)
     orig_length = len(drink_dict["result"])
@@ -74,22 +92,11 @@ def viz_page():
     pprint(drink_dict)
     print >> sys.stderr, "old %i versus new %i" % (orig_length, new_length)
    
-    return flask.jsonify(extended_drink_dict)
+    #return flask.jsonify(extended_drink_dict)
 
-# Get an example and return it's score from the predictor model
-@app.route("/score", methods=["POST"])
-def score():
-    """
-    When A POST request with json data is made to this uri,
-    Read the example from the json, predict probability and
-    send it with a response
-    """
-    # Get decision score for our example that came with the request
-    data = flask.request.json
-    x = np.matrix(data["example"])
-    score = PREDICTOR.predict_proba(x)
-    # Put the result in a nice dict so we can send it as json
-    results = {"score": score[0,1]}
+  
+    results = {"drinks": drink_dict, 
+               "extended_drinks": extended_drink_dict}
     return flask.jsonify(results)
 
 #--------- RUN WEB APP SERVER ------------#
