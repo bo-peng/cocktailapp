@@ -65,3 +65,6 @@ testing.ipynb
 
 #data
 *.pkl
+
+#downloaded stylings for offline dev
+static/
