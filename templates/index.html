@@ -40,6 +40,7 @@
     <div class="jumbotron">
       <div class="container">
         <h1>With these ingredients...</h1>
+	<img class="svg" src="{{ url_for('static', filename = 'img/cocktail_glass.svg') }}" height="20"></img>
   
       <ul>
         {% for ingredient in db_ingredients %}

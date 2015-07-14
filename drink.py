@@ -53,7 +53,7 @@ def mongo_query(ingredients_list=[]):
 #---------- URLS AND WEB PAGES -------------#
 
 # Initialize the app
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, static_url_path = "/static")
 
 # Homepage
 @app.route("/")
