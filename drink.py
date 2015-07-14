@@ -83,10 +83,14 @@ def subset():
     ingredients_list = data["ingredients"]
 
     drink_dict = mongo_query(ingredients_list)
+    drink_dict_ids = [x["site_id"] for x in drink_dict["result"]]
     orig_length = len(drink_dict["result"])
 
     extended_drink_list = ingredients_list + ["fresh lime juice", "sugar"]
     extended_drink_dict = mongo_query(extended_drink_list)
+    extended_drink_dict["result"] = [x for x in extended_drink_dict["result"] 
+                                     if x["site_id"] not in drink_dict_ids]
+    #import pdb; pdb.set_trace()
     new_length = len(extended_drink_dict["result"])
 
     pprint(drink_dict)
