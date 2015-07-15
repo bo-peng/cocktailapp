@@ -78,7 +78,8 @@ def drinks_short_n(ingredients_list=[], n=1):
                     "recognitions": 1,
                     "_id": 0,
                 }
-            }
+            },
+            { "$limit" : 5 }
         ]
     )
 

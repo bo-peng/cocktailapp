@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CocktailApp</title>
     <link rel="stylesheet" href="static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="static/css/app.css" />
+    <script src="//use.typekit.net/xnp3iid.js"></script>
+    <script>try{Typekit.load();}catch(e){}</script>
 
   
   </head>
@@ -37,11 +40,9 @@
     </nav>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
+    <div id="front_page" class="jumbotron">
       <div class="container">
         <h1>With these ingredients...</h1>
-	<img class="svg" src="{{ url_for('static', filename = 'img/cocktail_glass.svg') }}" height="20"></img>
-  
       <ul>
         {% for liquor_group in db_ingredients %}
 	    <p> {{liquor_group.category}} </p>
@@ -63,13 +64,18 @@
       <div class="row">
         <div id="subset_drinks_container" class="col-md-6">
           <h2>You can already make...</h2>
-
-       </div>
+	  
+	  <div class="panel-group" id="subset_accordion" role="tablist" aria-multiselectable="true">
+	  </div>
+	  
+	</div>
         <div id="limes_drinks_container"  class="col-md-6">
-          <h2>With limes, you can additionally make...</h2>
+          <h2>With one more ingredient, you can additionally make...</h2>
 	  <!-- <a class="btn btn-default" href="#" role="button">View details &raquo;</a></p> -->
+	  <div class="panel-group" id="n_more_accordion" role="tablist" aria-multiselectable="true">
+	  </div>
         </div>
-      </div>
+      </divx>
 
       <hr>
 
