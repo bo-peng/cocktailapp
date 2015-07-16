@@ -123,6 +123,10 @@ function make_drinks_accordion(array, accordion_id) {
 	var collapsed_body = document.createElement("div");
 	collapsed_body.className = "panel-body";
 	collapsed_body.innerHTML = array[i]["instructions"];
+
+	if (accordion_id == "n_more_accordion") {
+	    add_missing_ingredient(array[i], collapsed_body);
+	}
 	
 	collapsed_section.appendChild(collapsed_body);
 	
@@ -133,4 +137,11 @@ function make_drinks_accordion(array, accordion_id) {
     return accordion;
 }
 
+
+function add_missing_ingredient(drink_obj, parent) {
+    var missing = document.createElement("div");
+    var text = drink_obj.ingredients[0].ingredient
+    missing.innerHTML = "<i> missing " + text + "</i>";
+    parent.appendChild(missing);
+}
 
